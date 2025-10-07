@@ -14,16 +14,442 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      consents: {
+        Row: {
+          accepted_at: string | null
+          id: string
+          ip_address: unknown | null
+          marketing_accepted: boolean | null
+          privacy_accepted: boolean
+          terms_accepted: boolean
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          marketing_accepted?: boolean | null
+          privacy_accepted?: boolean
+          terms_accepted?: boolean
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          marketing_accepted?: boolean | null
+          privacy_accepted?: boolean
+          terms_accepted?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          end_date: string
+          id: string
+          location: string | null
+          organization_id: string
+          start_date: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          end_date: string
+          id?: string
+          location?: string | null
+          organization_id: string
+          start_date: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string
+          id?: string
+          location?: string | null
+          organization_id?: string
+          start_date?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expenses: {
+        Row: {
+          actual_amount: number | null
+          category: string
+          created_at: string | null
+          description: string | null
+          estimated_amount: number | null
+          id: string
+          organization_id: string
+          paid_at: string | null
+          status: Database["public"]["Enums"]["expense_status"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          actual_amount?: number | null
+          category: string
+          created_at?: string | null
+          description?: string | null
+          estimated_amount?: number | null
+          id?: string
+          organization_id: string
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["expense_status"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          actual_amount?: number | null
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          estimated_amount?: number | null
+          id?: string
+          organization_id?: string
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["expense_status"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guests: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          organization_id: string
+          phone: string | null
+          plus_one: boolean | null
+          status: Database["public"]["Enums"]["guest_status"]
+          table_number: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          organization_id: string
+          phone?: string | null
+          plus_one?: boolean | null
+          status?: Database["public"]["Enums"]["guest_status"]
+          table_number?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          organization_id?: string
+          phone?: string | null
+          plus_one?: boolean | null
+          status?: Database["public"]["Enums"]["guest_status"]
+          table_number?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          created_at: string | null
+          id: string
+          owner_id: string
+          partner_name: string | null
+          updated_at: string | null
+          venue: string | null
+          wedding_date: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          owner_id: string
+          partner_name?: string | null
+          updated_at?: string | null
+          venue?: string | null
+          wedding_date?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          owner_id?: string
+          partner_name?: string | null
+          updated_at?: string | null
+          venue?: string | null
+          wedding_date?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          theme_preference: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name: string
+          id?: string
+          phone?: string | null
+          theme_preference?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          theme_preference?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          status: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          status?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          status?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          category: Database["public"]["Enums"]["task_category"]
+          completed_at: string | null
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          organization_id: string
+          priority: number | null
+          status: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["task_category"]
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          organization_id: string
+          priority?: number | null
+          status?: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["task_category"]
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          organization_id?: string
+          priority?: number | null
+          status?: Database["public"]["Enums"]["task_status"]
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vendors: {
+        Row: {
+          average_price: number | null
+          category: string
+          city: string | null
+          created_at: string | null
+          description: string | null
+          email: string | null
+          id: string
+          image_url: string | null
+          is_premium: boolean | null
+          name: string
+          phone: string | null
+          rating: number | null
+          updated_at: string | null
+          user_id: string | null
+          website: string | null
+        }
+        Insert: {
+          average_price?: number | null
+          category: string
+          city?: string | null
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          is_premium?: boolean | null
+          name: string
+          phone?: string | null
+          rating?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Update: {
+          average_price?: number | null
+          category?: string
+          city?: string | null
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          is_premium?: boolean | null
+          name?: string
+          phone?: string | null
+          rating?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user" | "vendor"
+      expense_status: "pending" | "paid"
+      guest_status: "pending" | "confirmed" | "declined"
+      subscription_plan: "free" | "premium"
+      task_category:
+        | "ceremony"
+        | "reception"
+        | "guests"
+        | "vendors"
+        | "financial"
+        | "other"
+      task_status: "pending" | "in_progress" | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +576,20 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user", "vendor"],
+      expense_status: ["pending", "paid"],
+      guest_status: ["pending", "confirmed", "declined"],
+      subscription_plan: ["free", "premium"],
+      task_category: [
+        "ceremony",
+        "reception",
+        "guests",
+        "vendors",
+        "financial",
+        "other",
+      ],
+      task_status: ["pending", "in_progress", "completed"],
+    },
   },
 } as const
