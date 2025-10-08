@@ -28,6 +28,7 @@ export default function Dashboard() {
     budgetSpent: 0,
     budgetTotal: 0,
   });
+  const [hasOrganization, setHasOrganization] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -37,9 +38,31 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (user) {
-      loadDashboardData();
+      checkOrganization();
     }
   }, [user]);
+
+  const checkOrganization = async () => {
+    if (!user) return;
+    
+    try {
+      const { data: org } = await supabase
+        .from('organizations')
+        .select('id')
+        .eq('owner_id', user.id)
+        .maybeSingle();
+
+      if (!org) {
+        setHasOrganization(false);
+        navigate('/setup');
+      } else {
+        setHasOrganization(true);
+        loadDashboardData();
+      }
+    } catch (error) {
+      console.error('Error checking organization:', error);
+    }
+  };
 
   const loadDashboardData = async () => {
     if (!user) return;
@@ -50,9 +73,12 @@ export default function Dashboard() {
         .from('organizations')
         .select('id')
         .eq('owner_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (!org) return;
+      if (!org) {
+        setHasOrganization(false);
+        return;
+      }
 
       // Get tasks stats
       const { data: tasks } = await supabase
@@ -99,7 +125,7 @@ export default function Dashboard() {
     toast.success('Até logo! 💍');
   };
 
-  if (loading) {
+  if (loading || hasOrganization === null) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
