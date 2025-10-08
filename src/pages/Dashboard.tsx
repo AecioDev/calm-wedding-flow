@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   CheckCircle2, 
   Calendar, 
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import logo from '@/assets/logo-no-bg.png';
+import { TaskList } from '@/components/tasks/TaskList';
 
 export default function Dashboard() {
   const { user, signOut, loading } = useAuth();
@@ -29,6 +31,8 @@ export default function Dashboard() {
     budgetTotal: 0,
   });
   const [hasOrganization, setHasOrganization] = useState<boolean | null>(null);
+  const [organizationId, setOrganizationId] = useState<string | null>(null);
+  const [tasks, setTasks] = useState<any[]>([]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -80,14 +84,20 @@ export default function Dashboard() {
         return;
       }
 
-      // Get tasks stats
-      const { data: tasks } = await supabase
-        .from('tasks')
-        .select('status')
-        .eq('organization_id', org.id);
+      setOrganizationId(org.id);
 
-      const tasksTotal = tasks?.length || 0;
-      const tasksCompleted = tasks?.filter(t => t.status === 'completed').length || 0;
+      // Get tasks
+      const { data: tasksData } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('organization_id', org.id)
+        .order('priority', { ascending: false })
+        .order('due_date', { ascending: true });
+
+      setTasks(tasksData || []);
+
+      const tasksTotal = tasksData?.length || 0;
+      const tasksCompleted = tasksData?.filter(t => t.status === 'completed').length || 0;
 
       // Get guests stats
       const { data: guests } = await supabase
@@ -244,28 +254,55 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Acesso Rápido</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button variant="outline" className="h-24 flex-col gap-2">
-              <CheckCircle2 className="h-6 w-6" />
-              <span>Tarefas</span>
-            </Button>
-            <Button variant="outline" className="h-24 flex-col gap-2">
-              <Calendar className="h-6 w-6" />
-              <span>Calendário</span>
-            </Button>
-            <Button variant="outline" className="h-24 flex-col gap-2">
-              <DollarSign className="h-6 w-6" />
-              <span>Orçamento</span>
-            </Button>
-            <Button variant="outline" className="h-24 flex-col gap-2">
-              <Users className="h-6 w-6" />
-              <span>Convidados</span>
-            </Button>
-          </div>
-        </div>
+        {/* Content Tabs */}
+        <Tabs defaultValue="overview" className="mt-8">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+            <TabsTrigger value="tasks">Tarefas</TabsTrigger>
+            <TabsTrigger value="calendar">Calendário</TabsTrigger>
+            <TabsTrigger value="budget">Orçamento</TabsTrigger>
+            <TabsTrigger value="guests">Convidados</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-4 mt-6">
+            <h2 className="text-xl font-semibold">Próximas Tarefas</h2>
+            <p className="text-muted-foreground">Use as abas acima para navegar entre as seções.</p>
+          </TabsContent>
+
+          <TabsContent value="tasks" className="mt-6">
+            {organizationId && (
+              <TaskList 
+                organizationId={organizationId}
+                tasks={tasks}
+                onTasksChange={loadDashboardData}
+              />
+            )}
+          </TabsContent>
+
+          <TabsContent value="calendar" className="mt-6">
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-muted-foreground text-center">Calendário em desenvolvimento...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="budget" className="mt-6">
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-muted-foreground text-center">Orçamento em desenvolvimento...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="guests" className="mt-6">
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-muted-foreground text-center">Lista de convidados em desenvolvimento...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
