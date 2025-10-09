@@ -33,7 +33,7 @@ export default function Dashboard() {
     budgetTotal: 0,
   });
   const [hasOrganization, setHasOrganization] = useState<boolean | null>(null);
-  const [organizationId, setOrganizationId] = useState<string | null>(null);
+  const [organization, setOrganization] = useState<any>(null);
   const [tasks, setTasks] = useState<any[]>([]);
   const [expenses, setExpenses] = useState<any[]>([]);
 
@@ -78,7 +78,7 @@ export default function Dashboard() {
       // Get user's organization
       const { data: org } = await supabase
         .from('organizations')
-        .select('id')
+        .select('*')
         .eq('owner_id', user.id)
         .maybeSingle();
 
@@ -87,7 +87,7 @@ export default function Dashboard() {
         return;
       }
 
-      setOrganizationId(org.id);
+      setOrganization(org);
 
       // Get tasks
       const { data: tasksData } = await supabase
@@ -98,6 +98,15 @@ export default function Dashboard() {
         .order('due_date', { ascending: true });
 
       setTasks(tasksData || []);
+      
+      // Get expenses
+      const { data: expensesData } = await supabase
+        .from('expenses')
+        .select('*')
+        .eq('organization_id', org.id)
+        .order('created_at', { ascending: false });
+
+      setExpenses(expensesData || []);
 
       const tasksTotal = tasksData?.length || 0;
       const tasksCompleted = tasksData?.filter(t => t.status === 'completed').length || 0;
@@ -111,14 +120,9 @@ export default function Dashboard() {
       const guestsTotal = guests?.length || 0;
       const guestsConfirmed = guests?.filter(g => g.status === 'confirmed').length || 0;
 
-      // Get budget stats
-      const { data: expenses } = await supabase
-        .from('expenses')
-        .select('estimated_amount, actual_amount')
-        .eq('organization_id', org.id);
-
-      const budgetTotal = expenses?.reduce((sum, e) => sum + (Number(e.estimated_amount) || 0), 0) || 0;
-      const budgetSpent = expenses?.reduce((sum, e) => sum + (Number(e.actual_amount) || 0), 0) || 0;
+      // Calculate budget stats from expenses already loaded
+      const budgetTotal = expensesData?.reduce((sum, e) => sum + (Number(e.estimated_amount) || 0), 0) || 0;
+      const budgetSpent = expensesData?.reduce((sum, e) => sum + (Number(e.actual_amount) || 0), 0) || 0;
 
       setStats({
         tasksCompleted,
@@ -273,9 +277,9 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="tasks" className="mt-6">
-            {organizationId && (
+            {organization && (
               <TaskList 
-                organizationId={organizationId}
+                organizationId={organization.id}
                 tasks={tasks}
                 onTasksChange={loadDashboardData}
               />
@@ -290,12 +294,17 @@ export default function Dashboard() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="budget" className="mt-6">
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-muted-foreground text-center">Orçamento em desenvolvimento...</p>
-              </CardContent>
-            </Card>
+          <TabsContent value="budget" className="space-y-6 mt-6">
+            {organization && (
+              <>
+                <BudgetOverview expenses={expenses} />
+                <ExpenseList 
+                  organizationId={organization.id} 
+                  expenses={expenses}
+                  onExpensesChange={loadDashboardData}
+                />
+              </>
+            )}
           </TabsContent>
 
           <TabsContent value="guests" className="mt-6">
