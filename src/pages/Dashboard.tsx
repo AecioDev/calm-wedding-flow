@@ -18,6 +18,8 @@ import {
 import { toast } from 'sonner';
 import logo from '@/assets/logo-no-bg.png';
 import { TaskList } from '@/components/tasks/TaskList';
+import { BudgetOverview } from '@/components/budget/BudgetOverview';
+import { ExpenseList } from '@/components/budget/ExpenseList';
 
 export default function Dashboard() {
   const { user, signOut, loading } = useAuth();
@@ -33,6 +35,7 @@ export default function Dashboard() {
   const [hasOrganization, setHasOrganization] = useState<boolean | null>(null);
   const [organizationId, setOrganizationId] = useState<string | null>(null);
   const [tasks, setTasks] = useState<any[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
 
   useEffect(() => {
     if (!loading && !user) {
